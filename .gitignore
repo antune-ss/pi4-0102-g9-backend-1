@@ -47,3 +47,10 @@ buildNumber.properties
 
 # Mac
 .DS_Store
+
+# Docker / Broker local data and logs
+**/mosquitto/data/
+**/mosquitto/log/
+data/
+logs/
+.env
