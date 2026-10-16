@@ -1,0 +1,32 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: co2nect-mosquitto
+    restart: unless-stopped # Se o computador reiniciar ou o processo falhar, o Docker sobe o serviço de novo automaticamente.
+    ports:
+      - "1883:1883" # <porta-no-seu-PC>:<porta-dentro-do-container>
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # Mapeia o arquivo de configuração local para dentro do container. O sufixo :ro (read-only) garante que o contêiner não possa alterar o arquivo no host.
+      - mosquitto_data:/mosquitto/data # Mapeia o diretório de dados do container para um volume nomeado. Isso garante que os dados (logs e persistência) sobrevivam à exclusão e recriação do contêiner.
+      - mosquitto_logs:/mosquitto/log # Mapeia o diretório de logs do container para um volume nomeado. Isso permite que você acesse os logs do broker fora do contêiner, se necessário, embora geralmente seja melhor usar 'docker logs'.
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: co2nect-postgres
+    restart: unless-stopped
+    environment:
+      # Variáveis que o contêiner lê na primeira inicialização para criar o banco e as credenciais
+      POSTGRES_DB: co2nect_db
+      POSTGRES_USER: co2nect_user
+      POSTGRES_PASSWORD: co2nect_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Volume Nomeado. Por padrão, tudo gravado dentro de um contêiner morre quando ele é apagado. Mapear o diretório interno do Postgres para um volume gerenciado pelo Docker garante que os dados dos sensores continuem salvos no disco.
+      - ./init-db/01-create-tables.sql:/docker-entrypoint-initdb.d/01-create-tables.sql:ro # A imagem oficial do Postgres executa automaticamente na inicialização qualquer script .sql presente no diretório /docker-entrypoint-initdb.d/. Isso significa que assim que o contêiner subir pela primeira vez, a tabela sensor_reading já estará criada
+
+# Declaração global dos volumes gerenciados pelo Docker
+volumes:
+  mosquitto_data:
+  mosquitto_logs:
+  postgres_data:

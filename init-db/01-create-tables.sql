@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS sensor_reading (
+    id SERIAL PRIMARY KEY,
+    device_id VARCHAR(50) NOT NULL,
+    co2 INTEGER NOT NULL,
+    temperature NUMERIC(5, 2) NOT NULL,
+    humidity NUMERIC(5, 2) NOT NULL,
+    measured_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
