@@ -43,6 +43,12 @@
       <artifactId>gson</artifactId>
       <version>2.10.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.paho</groupId>
+      <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+      <version>1.2.5</version>
+  </dependency>
   </dependencies>
 
   <build>
@@ -96,7 +102,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.1.0</version>
         <configuration>
-          <mainClass>br.puc.campinas.co2nect.App</mainClass>
+          <mainClass>br.puc.campinas.co2nect.MqttTest</mainClass>
         </configuration>
       </plugin>
       <!-- Plugin para gerar um JAR executável com todas as dependências -->
@@ -113,7 +119,7 @@
             <configuration>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>br.puc.campinas.co2nect.App</mainClass>
+                  <mainClass>br.puc.campinas.co2nect.MqttTest</mainClass>
                 </transformer>
               </transformers>
             </configuration>

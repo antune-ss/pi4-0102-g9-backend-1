@@ -10,6 +10,9 @@ import com.google.gson.Gson;
 
 import org.java_websocket.WebSocket;
 
+import br.puc.campinas.co2nect.model.SensorData;
+import br.puc.campinas.co2nect.repository.DatabaseManager;
+
 public class SensorServer extends WebSocketServer {
     private DatabaseManager db;
 

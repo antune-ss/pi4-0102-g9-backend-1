@@ -1,4 +1,5 @@
 package br.puc.campinas.co2nect;
+import br.puc.campinas.co2nect.repository.DatabaseManager;
 
 public class App {
   public static void main(String[] args) {

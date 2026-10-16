@@ -1,5 +1,5 @@
-package br.puc.campinas.co2nect;
-
+package br.puc.campinas.co2nect.repository;
+import br.puc.campinas.co2nect.model.SensorData;
 import java.sql.*;
 
 public class DatabaseManager {
