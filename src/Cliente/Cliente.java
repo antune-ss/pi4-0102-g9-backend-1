@@ -67,5 +67,6 @@ public class Cliente {
         } catch (Exception e) {
         }
 
+        // esta parte ainda será construida de acordo com o que será necessário
     }
 }

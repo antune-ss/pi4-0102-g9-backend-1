@@ -55,8 +55,7 @@ public class Parceiro {
 
     public Comunicado espie() throws Exception {
         try {
-            // mutex é usado para que não se sobrescreva o que vai ser espiado antes de ser
-            // lido
+            // mutex é usado para que não se sobrescreva o que vai ser espiado
             this.mutEx.acquireUninterruptibly();
             if (this.proximoComunicado == null)
                 this.proximoComunicado = (Comunicado) this.receptor.readObject();
