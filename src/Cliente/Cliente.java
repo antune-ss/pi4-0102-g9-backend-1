@@ -67,6 +67,23 @@ public class Cliente {
         } catch (Exception e) {
         }
 
+        LeitorMqtt leitor = new LeitorMqtt();
+
         // esta parte ainda será construida de acordo com o que será necessário
+        // provavelmente vamos fazer o insert da nossa Leitura e mandar para o WebSocket
+        do {
+            leitor.iniciar();
+
+            /*
+             * algo como:
+             * 
+             * public void processarLeitura(Leitura leitura) {
+             * repositorio.salvar(leitura);
+             * servidorWebSocket.enviarLeitura(leitura);
+             * }
+             * 
+             * (Esta função estaria dentro do LeitorMqtt)
+             */
+        } while (true);
     }
 }
