@@ -17,6 +17,23 @@ Leitura agora pode manusear os valores como bem quiser
 
 ## Interação Cliente-Servidor
 
+Bom, eu tinha começado fazendo Leitura e LeitorMqtt no Cliente, mas pensando melhor, faz mais sentido deixar isso para Servidor, que irá receber as chamadas JSON do ESP32 e mandar os dados para o banco e então para o front do Websocket, ou seja, para o Cliente que está esperando essa informação
+
+Então ficou
+
+### Servidor
+
+- Recebe as informações do ESP32 via LeitorMqtt
+- LeitorMqtt instância a classe Leitura de acordo com os valores recebidos
+- Servidor usa os valores para adicionar as informações ao banco
+- Manda as informações para o front (Cliente)
+
+### Cliente
+
+- Recebe as informações do Servidor
+- Manda as informações para o frontend, podendo ser para o dashboard ou algum gráfico
+- Pode mandar requisições de banco para o Servidor, como um SELECT
+
 
 ## MQTT
 

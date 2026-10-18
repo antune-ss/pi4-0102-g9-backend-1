@@ -67,22 +67,28 @@ public class Cliente {
         } catch (Exception e) {
         }
 
-        LeitorMqtt leitor = new LeitorMqtt();
-
         // esta parte ainda será construida de acordo com o que será necessário
-        // provavelmente vamos fazer o insert da nossa Leitura e mandar para o WebSocket
         do {
-            leitor.iniciar();
-
             /*
-             * algo como:
+             * Existem duas opções:
              * 
-             * public void processarLeitura(Leitura leitura) {
-             * repositorio.salvar(leitura);
-             * servidorWebSocket.enviarLeitura(leitura);
-             * }
+             * Opção A — Recomendada: navegador → Servidor.java
+             * O JavaScript abre um WebSocket diretamente com o servidor. O Cliente.java
+             * continua existindo como cliente Java para a comunicação exigida pelo
+             * professor, mas não precisa intermediar as mensagens do navegador.
+             * Mais simples para um dashboard web e atualizações em tempo real.
              * 
-             * (Esta função estaria dentro do LeitorMqtt)
+             * 
+             * Opção B — Navegador → Cliente.java → Servidor.java
+             * O Cliente.java precisaria aceitar conexões WebSocket do navegador e,
+             * separadamente, encaminhar as mensagens ao Servidor.java pelo socket Java. Ele
+             * funcionaria como uma ponte entre os dois protocolos.
+             * Possível, mas adiciona complexidade e exige que o cliente Java esteja
+             * executando e acessível pelo navegador.
+             * 
+             * 
+             * Recomendação do chat: é a Opção A, a menos que o professor tenha exigido
+             * explicitamente que toda comunicação do frontend passe pelo Cliente.java.
              */
         } while (true);
     }
