@@ -47,3 +47,11 @@ buildNumber.properties
 
 # Mac
 .DS_Store
+
+# Environment Variables
+.env
+
+# Certificates
+certs/*.crt
+certs/*.pem
+certs/*.key
