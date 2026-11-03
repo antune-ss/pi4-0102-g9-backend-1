@@ -19,25 +19,29 @@
   </properties>
 
   <dependencies>
+    <!-- Testes Unitários -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
 
+    <!-- Cliente MQTT Oficial (Eclipse Paho v3) -->
     <dependency>
-      <groupId>org.java-websocket</groupId>
-      <artifactId>Java-WebSocket</artifactId>
-      <version>1.6.0</version>
+      <groupId>org.eclipse.paho</groupId>
+      <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+      <version>1.2.5</version>
     </dependency>
 
+    <!-- Driver JDBC para PostgreSQL -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>42.7.13</version>
     </dependency>
 
+    <!-- Serialização e Desserialização JSON (Google Gson) -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
