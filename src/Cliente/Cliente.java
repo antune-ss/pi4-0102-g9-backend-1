@@ -1,5 +1,8 @@
 package src.Cliente;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import java.net.*;
 import java.io.*;
 
@@ -67,29 +70,21 @@ public class Cliente {
         } catch (Exception e) {
         }
 
-        // esta parte ainda será construida de acordo com o que será necessário
+        BlockingQueue<Leitura> fila = new LinkedBlockingQueue<>();
+        try {
+            LeitorMqtt leitor = new LeitorMqtt();
+            leitor.iniciar();
+        } catch (Exception e) {
+            System.out.println("Erro com o Leitor Mqtt");
+        }
+
         do {
-            /*
-             * Existem duas opções:
-             * 
-             * Opção A — Recomendada: navegador → Servidor.java
-             * O JavaScript abre um WebSocket diretamente com o servidor. O Cliente.java
-             * continua existindo como cliente Java para a comunicação exigida pelo
-             * professor, mas não precisa intermediar as mensagens do navegador.
-             * Mais simples para um dashboard web e atualizações em tempo real.
-             * 
-             * 
-             * Opção B — Navegador → Cliente.java → Servidor.java
-             * O Cliente.java precisaria aceitar conexões WebSocket do navegador e,
-             * separadamente, encaminhar as mensagens ao Servidor.java pelo socket Java. Ele
-             * funcionaria como uma ponte entre os dois protocolos.
-             * Possível, mas adiciona complexidade e exige que o cliente Java esteja
-             * executando e acessível pelo navegador.
-             * 
-             * 
-             * Recomendação do chat: é a Opção A, a menos que o professor tenha exigido
-             * explicitamente que toda comunicação do frontend passe pelo Cliente.java.
-             */
+            //Meu LeitorMqtt lança as Leituras no BlockingQueue
+            Leitura leitura = fila.take();
+
+            output.writeObject(leitura);
+            output.flush();
+
         } while (true);
     }
 }

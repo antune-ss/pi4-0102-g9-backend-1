@@ -1,5 +1,8 @@
 package src.Cliente;
 
+//Para mandar a leitura para o Cliente
+import java.util.concurrent.BlockingQueue;
+
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -11,6 +14,11 @@ import java.util.UUID;
 public class LeitorMqtt implements MqttCallback {
 
     private MqttClient cliente;
+    private BlockingQueue<Leitura> fila;
+
+    public LeitorMqtt(BlockingQueue<Leitura> fila) {
+        this.fila = fila;
+    }
 
     public void iniciar() throws MqttException {
 
@@ -38,18 +46,12 @@ public class LeitorMqtt implements MqttCallback {
         try {
             // declarando nossa leitura
             Leitura leitura = Leitura.pegaLeitura(mensagem);
+            fila.put(leitura);
             // mensagem para testes, apagar depois
             System.out.println("Leitura convertida com sucesso!");
 
-            // Futuramente:
-            // salvarLeituraNoBanco(leitura)
-            // ou
-            // mandar para outra classe nossa leitura para que seja tratada
-
         } catch (RuntimeException e) {
-            System.err.println(
-                    "Erro ao interpretar ou validar a leitura: "
-                            + e.getMessage());
+            System.err.println("Erro ao interpretar ou validar a leitura: " + e.getMessage());
         }
     }
 
@@ -67,7 +69,6 @@ public class LeitorMqtt implements MqttCallback {
         // publicadas pelo próprio cliente.
     }
 
-    @Override
     public void close() throws MqttException {
         if (cliente != null && cliente.isConnected()) {
             cliente.disconnect();
@@ -76,10 +77,5 @@ public class LeitorMqtt implements MqttCallback {
         if (cliente != null) {
             cliente.close();
         }
-    }
-
-    public static void main(String[] args) throws MqttException {
-        LeitorMqtt leitor = new LeitorMqtt();
-        leitor.iniciar();
     }
 }

@@ -33,9 +33,8 @@ public class Leitura implements Serializable {
         setDeviceId(devId);
         setCo2(co2);
         setTemperature(temp);
-        validaString(measure);
-        validaDouble(hum);
-
+        setHumidity(hum);
+        setMeasuredAt(measure);
     }
 
     public void setDeviceId(String deviceId) {

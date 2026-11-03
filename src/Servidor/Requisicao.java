@@ -1,5 +1,7 @@
-package src.Cliente;
+package src.Servidor;
 
+// **essa classe foi uma ideia, que pode ser removida caso não faça sentido
+// vamos receber os SQLs prontos do frontend e apenas executá-los
 public class Requisicao {
     private String sql;
 

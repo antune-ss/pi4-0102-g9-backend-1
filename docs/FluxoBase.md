@@ -11,28 +11,29 @@ ESP32 pega valores medidos ->
 Publica os valores via MQTT ->
 Classe LeitorMqtt pega a publicação via método messageArrived() -> 
 Os valores de messageArrived() são passados para uma instância de Leitura ->
-Leitura agora pode manusear os valores como bem quiser
-
--> Tendo Leitura pronta, é possível mandar seus valores para o Websocket e para o Postgre
+Leitura agora pode manusear os valores como bem quiser ->
+Tendo Leitura pronta, é possível mandar seus valores para o Servidor ->
+Servidor pega a Leitura e manda para o Websocket e Banco ->
+Websocket pode mandar pedidos para o Servidor relacionado ao Banco ->
+Servidor devolve o que for pedido
 
 ## Interação Cliente-Servidor
 
-Bom, eu tinha começado fazendo Leitura e LeitorMqtt no Cliente, mas pensando melhor, faz mais sentido deixar isso para Servidor, que irá receber as chamadas JSON do ESP32 e mandar os dados para o banco e então para o front do Websocket, ou seja, para o Cliente que está esperando essa informação
+O Cliente representa o ESP32, que enviará postará mensagens no canal do Broker, com isso, a classe LeitorMqtt irá ler a mensagem postada e converte-la em um objeto de Leitura, que será enfileirado em uma BlockingQueue (que é uma fila que funciona para todas as possíveis threads ao mesmo tempo [aqui, threads seriam basicamente os ESP32, caso houvessem mais, a fila receberia as informações de todos]), com o BlockingQueue, é possível que Cliente acesse as Leituras enfileiradas e as envie diretamente para o Servidor, que fará suas tratativas para se comunicar com os outros extremos
 
 Então ficou
 
 ### Servidor
 
-- Recebe as informações do ESP32 via LeitorMqtt
-- LeitorMqtt instância a classe Leitura de acordo com os valores recebidos
+- Recebe as Leituras do Cliente
 - Servidor usa os valores para adicionar as informações ao banco
-- Manda as informações para o front (Cliente)
+- Manda as informações para o front (Dashboard ou Resultados de requisições de banco)
 
 ### Cliente
 
-- Recebe as informações do Servidor
-- Manda as informações para o frontend, podendo ser para o dashboard ou algum gráfico
-- Pode mandar requisições de banco para o Servidor, como um SELECT
+- Recebe as informações do ESP32 via LeitorMqtt
+- LeitorMqtt instância a classe Leitura de acordo com os valores recebidos
+- Manda as informações para o Servidor.
 
 
 ## MQTT
