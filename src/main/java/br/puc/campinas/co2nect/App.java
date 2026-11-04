@@ -197,7 +197,7 @@ public class App {
         System.out.println("  1. Local (Docker: Mosquitto + Postgres)");
         System.out.println("  2. Nuvem (EMQX Cloud + Supabase)");
         System.out.println("========================================");
-        System.out.println("Escolha o perfil [1 ou 2] (padrão: 2): ");
+        System.out.print("Escolha o perfil [1 ou 2] (padrão: 2): ");
 
         // Nn pode dar close() nessa bomba senão eu nn vou poder mais pegar input no terminal em nenhuma parte do código, o Suppres é para tirar o warn
         @SuppressWarnings("resource")
