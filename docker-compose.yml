@@ -5,6 +5,7 @@ services:
     restart: unless-stopped # Se o computador reiniciar ou o processo falhar, o Docker sobe o serviço de novo automaticamente.
     ports:
       - "1883:1883" # <porta-no-seu-PC>:<porta-dentro-do-container>
+      - "9001:9001"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # Mapeia o arquivo de configuração local para dentro do container. O sufixo :ro (read-only) garante que o contêiner não possa alterar o arquivo no host.
       - mosquitto_data:/mosquitto/data # Mapeia o diretório de dados do container para um volume nomeado. Isso garante que os dados (logs e persistência) sobrevivam à exclusão e recriação do contêiner.
