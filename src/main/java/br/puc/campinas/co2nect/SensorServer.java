@@ -2,60 +2,63 @@ package br.puc.campinas.co2nect;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.time.Instant;
 
+import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import com.google.gson.Gson;
 
-import org.java_websocket.WebSocket;
-
+/** Servidor WebSocket mantido para o fluxo de comunicação já existente no projeto. */
 public class SensorServer extends WebSocketServer {
-    private DatabaseManager db;
+    private final DatabaseManager database;
+    private final Gson gson = new Gson();
 
-    SensorServer(int port, DatabaseManager db) throws UnknownHostException {
+    public SensorServer(int port, DatabaseManager database) throws UnknownHostException {
         super(new InetSocketAddress(port));
-        this.db = db;
+        if (database == null) {
+            throw new IllegalArgumentException("DatabaseManager é obrigatório.");
+        }
+        this.database = database;
     }
 
     @Override
-    public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        // O que o servidor deve fazer quando o ESP32 conseguir conectar com sucesso?
-        System.out.println(conn.getRemoteSocketAddress().getAddress().getHostName() + " connected with the server.");
+    public void onOpen(WebSocket connection, ClientHandshake handshake) {
+        System.out.println("[WS] Cliente conectado: " + connection.getRemoteSocketAddress());
     }
 
     @Override
-    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        // O que fazer quando a conexão cair ou o ESP32 for desligado?
-        System.out.println(conn + ": " + reason);
+    public void onClose(WebSocket connection, int code, String reason, boolean remote) {
+        System.out.println("[WS] Cliente desconectado: " + reason);
     }
 
     @Override
-    public void onMessage(WebSocket conn, String message) {
-        // Toda vez que o ESP32 enviar uma leitura do sensor (ex: um texto JSON com o CO2), esse método será chamado automaticamente e o texto estará dentro da variável message.
-        System.out.println(conn + ": " + message);
-
-        Gson gson = new Gson();
-        SensorData data = gson.fromJson(message, SensorData.class);
-
-        db.saveRead(data);
-        System.out.println("");
-    }
-
-    @Override
-    public void onError(WebSocket conn, Exception ex) {
-        // O que fazer se der algum erro na conexão?
-        ex.printStackTrace();
-        if (conn == null) {
-            // TODO: Nn sei ainda
+    public void onMessage(WebSocket connection, String message) {
+        try {
+            SensorData data = gson.fromJson(message, SensorData.class);
+            if (data == null) {
+                throw new IllegalArgumentException("Payload vazio ou inválido.");
+            }
+            if (data.measuredAt == null || data.measuredAt.isBlank()) {
+                data.measuredAt = Instant.now().toString();
+            }
+            long id = database.saveRead(data);
+            System.out.println("[WS] Medição persistida: id=" + id
+                    + ", dispositivo=" + data.deviceId);
+        } catch (Exception exception) {
+            System.err.println("[WS] Mensagem não persistida: " + exception.getMessage());
         }
     }
 
     @Override
+    public void onError(WebSocket connection, Exception exception) {
+        System.err.println("[WS] Erro no servidor WebSocket: " + exception.getMessage());
+    }
+
+    @Override
     public void onStart() {
-        // O que fazer quando o servidor ligar com sucesso na porta definida?
-        System.out.println("Server started on port: " + getPort());
-        setConnectionLostTimeout(0);
+        System.out.println("[WS] Servidor iniciado na porta " + getPort());
         setConnectionLostTimeout(100);
     }
 }
