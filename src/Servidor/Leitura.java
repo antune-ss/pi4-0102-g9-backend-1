@@ -1,5 +1,8 @@
 package src.Cliente;
 
+//Usando Serializable para que seja possível mandar a classe no ObjectOutputStream
+import java.io.Serializable;
+
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.google.gson.JsonObject;
@@ -7,7 +10,7 @@ import com.google.gson.JsonParser;
 
 import java.nio.charset.StandardCharsets;
 
-public class Leitura {
+public class Leitura implements Serializable {
     private String deviceId;
     private double co2;
     private double temperature;
@@ -30,9 +33,8 @@ public class Leitura {
         setDeviceId(devId);
         setCo2(co2);
         setTemperature(temp);
-        validaString(measure);
-        validaDouble(hum);
-
+        setHumidity(hum);
+        setMeasuredAt(measure);
     }
 
     public void setDeviceId(String deviceId) {
