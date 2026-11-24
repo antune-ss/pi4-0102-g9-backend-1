@@ -1,4 +1,6 @@
-# Modelo entidade-relacionamento
+# Modelo entidade-relacionamento — CO₂NNECT
+
+Fonte: `database/init/01-schema.sql` (schema versionado e montado pelo Compose local).
 
 ```mermaid
 erDiagram
@@ -24,10 +26,8 @@ erDiagram
     }
 ```
 
-## Justificativa das tabelas
-
-- `sensor_device` separa a identidade e o estado do dispositivo das amostras. Isso evita repetir localização/nome em toda medição e permite consultar se o dispositivo está online.
-- `sensor_reading` é uma tabela histórica append-only para os valores coletados. Não se atualiza a medição anterior quando chega uma nova.
-- O índice composto `(device_id, measured_at DESC, id DESC)` atende a consultas de histórico por dispositivo e intervalo e ordenação mais recente primeiro.
-- O índice em `received_at` ajuda a investigar atraso ou volume de ingestão.
-- As médias do relatório são calculadas com `AVG` no PostgreSQL, não armazenadas como colunas, para não manter dados derivados inconsistentes.
+- `sensor_device`: cadastro de cada dispositivo e seu estado de conectividade mais recente.
+- `sensor_reading`: histórico de amostras ambientais. Cada linha referencia exatamente um dispositivo.
+- Cardinalidade: `sensor_device` 1:N `sensor_reading` (um dispositivo pode ter zero ou muitas leituras).
+- Chave estrangeira: `sensor_reading.device_id` → `sensor_device.device_id`, `ON DELETE RESTRICT`.
+- O diagrama representa o SQL versionado; a equivalência com o schema remoto do Supabase deve ser verificada separadamente.
