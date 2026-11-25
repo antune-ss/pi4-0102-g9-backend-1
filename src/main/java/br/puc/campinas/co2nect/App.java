@@ -1,7 +1,9 @@
 package br.puc.campinas.co2nect;
 
 import br.puc.campinas.co2nect.mqtt.MqttSubscriber;
+import br.puc.campinas.co2nect.repository.DeviceRepository;
 import br.puc.campinas.co2nect.repository.ReadingRepository;
+import br.puc.campinas.co2nect.service.DeviceService;
 import br.puc.campinas.co2nect.service.SensorReadingService;
 
 import java.io.BufferedReader;
@@ -72,9 +74,13 @@ public class App {
 
         String[] topics = { "co2nect/+/telemetry", "co2nect/+/status" };
 
-        ReadingRepository repository = new ReadingRepository(dbUrl, dbUser, dbPass);
-        SensorReadingService service = new SensorReadingService(repository);
-        MqttSubscriber subscriber = new MqttSubscriber(brokerUrl, mqttUser, mqttPass, mqttCaCert, topics, service);
+        ReadingRepository readingRepository = new ReadingRepository(dbUrl, dbUser, dbPass);
+        SensorReadingService readingService = new SensorReadingService(readingRepository);
+
+        DeviceRepository deviceRepository = new DeviceRepository(dbUrl, dbUser, dbPass);
+        DeviceService deviceService = new DeviceService(deviceRepository);
+
+        MqttSubscriber subscriber = new MqttSubscriber(brokerUrl, mqttUser, mqttPass, mqttCaCert, topics, readingService, deviceService);
 
         /**
          * - Quando Ctrl + C é apertado no terminal (ou quando o Docker manda um comando docker stop), o sistema operacional envia um sinal de morte súbita (SIGINT ou SIGTERM) para a JVM.
@@ -92,7 +98,7 @@ public class App {
 
         try {
             subscriber.start();
-            System.out.println("[App] CO2NNECT Server is running. Press Ctrl+C to terminate.");
+            System.out.println("[App] CO2NNECT Server is running. Press Ctrl+C to terminate.\n");
 
             /**
              * - No Java, quando o método public static void main chega na sua última linha (a chave de fechamento }), a thread principal morre.

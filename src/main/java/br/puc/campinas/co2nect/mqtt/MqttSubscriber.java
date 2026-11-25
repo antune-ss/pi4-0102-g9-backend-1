@@ -2,6 +2,8 @@ package br.puc.campinas.co2nect.mqtt;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -18,6 +20,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 
 import br.puc.campinas.co2nect.model.SensorReading;
+import br.puc.campinas.co2nect.service.DeviceService;
 import br.puc.campinas.co2nect.service.SensorReadingService;
 
 /**
@@ -36,7 +39,8 @@ public class MqttSubscriber implements MqttCallbackExtended {
     private final String caCertPath;
 
     private final String[] topics;
-    private final SensorReadingService service;
+    private final SensorReadingService readingService;
+    private final DeviceService deviceService;
     private final Gson gson;
     private MqttClient client;
 
@@ -45,16 +49,18 @@ public class MqttSubscriber implements MqttCallbackExtended {
      * 
      * @param brokerUrl URL de conexão do broker (ex: "tcp://localhost:1883")
      * @param topics    lista de tópicos que o cliente deve assinar
-     * @param service   camada de serviço para processamento e validação das leituras
+     * @param readingService   camada de serviço para processamento e validação das leituras
+     * @param deviceService   camada de serviço para processamento e persistencia de dispositivos
      */
-    public MqttSubscriber(String brokerUrl, String username, String password, String caCertPath, String[] topics, SensorReadingService service) {
+    public MqttSubscriber(String brokerUrl, String username, String password, String caCertPath, String[] topics, SensorReadingService readingService, DeviceService deviceService) {
         this.brokerUrl = brokerUrl;
         this.username = username;
         this.password = password;
         this.caCertPath = caCertPath;
 
         this.topics = topics;
-        this.service = service;
+        this.readingService = readingService;
+        this.deviceService = deviceService;
 
         /**
          * Por padrão, o Gson desconhece as classes de data do Java 8+ (java.time.*) e tenta inspecionar
@@ -93,7 +99,21 @@ public class MqttSubscriber implements MqttCallbackExtended {
                     return LocalDateTime.now();
                 }
 
-                return LocalDateTime.parse(json.getAsString());
+                String dateStr = json.getAsString().trim();
+                try {
+                    // Trata datas com fuso horário (ex: "2026-11-18T21:03:23Z" do ESP32)
+                    // e converte para o horário local do Brasil
+                    return OffsetDateTime.parse(dateStr)
+                        .atZoneSameInstant(ZoneId.systemDefault())
+                        .toLocalDateTime();
+                } catch (Exception e) {
+                    try {
+                        // Trata datas locais sem fuso (ex: "2026-11-18T18:03:23")
+                        return LocalDateTime.parse(dateStr);
+                    } catch (Exception err) {
+                        return LocalDateTime.now();
+                    }
+                }
             }).create();
     }
 
@@ -228,11 +248,21 @@ public class MqttSubscriber implements MqttCallbackExtended {
                         reading.setDeviceId(parts[1]);
                     }
                 }
-                service.processReading(reading);
+                readingService.processReading(reading);
             } else if (topic.endsWith("/status")) {
                 System.out.println("[STATUS] Device status update on topic '" + topic + "': " + payload);
-                System.out.println();
-                // TODO (CT3): Tratar se o sensor está online (1) ou caiu (0 via Last Will and Testament)
+                
+                String deviceId = topic.split("/")[1];
+                boolean isOnline = false;
+
+                String body = payload.trim();
+                if (body.equals("1") || body.contains("\"status\": 1") || body.contains("\"status\":1")) {
+                    isOnline = true;
+                } else if (body.equals("0") || body.contains("\"status\": 0") || body.contains("\"status\":0")) {
+                    isOnline = false;
+                }
+
+                deviceService.updateStatus(deviceId, isOnline);
             } else {
                 System.out.println("[MQTT] Received message on unhandled topic: " + topic);
                 System.out.println();

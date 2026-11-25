@@ -1,6 +1,9 @@
 package br.puc.campinas.co2nect.repository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import br.puc.campinas.co2nect.model.SensorReading;
 
 /**

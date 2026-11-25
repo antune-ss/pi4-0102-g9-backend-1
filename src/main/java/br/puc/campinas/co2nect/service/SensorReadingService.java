@@ -22,7 +22,7 @@ public class SensorReadingService {
 
         if (reading.getCo2() > 1000) {
             System.out.println("[ALERT] High CO2 concentration detected (" + reading.getCo2() + " ppm) on device: " + reading.getDeviceId());
-            // TODO: Publicar comando 'turnOnAlarm' no topico co2nect/{deviceId}/command (CT4)
+            // TODO: Publicar comando 'turnOnAlarm' no topico co2nect/{deviceId}/command (CT4 - NN IMPLEMENTADO)
         }
 
         try {
