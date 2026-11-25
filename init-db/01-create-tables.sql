@@ -6,3 +6,12 @@ CREATE TABLE IF NOT EXISTS sensor_reading (
     humidity NUMERIC(5, 2) NOT NULL,
     measured_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS devices (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    location VARCHAR(100),
+    is_online BOOLEAN DEFAULT false,
+    last_seen TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
